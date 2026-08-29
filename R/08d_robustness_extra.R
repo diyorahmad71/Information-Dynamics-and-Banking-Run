@@ -54,7 +54,14 @@ tryCatch({
   car_i <- colSums(M, na.rm = TRUE)
   n <- sum(is.finite(car_i))
   t_naive <- mean(car_i) / (sd(car_i) / sqrt(n))
-  t_adj   <- t_naive / sqrt(1 + (n - 1) * rbar)
+  # FIX (KP formula). Kolari & Pynnonen (2010) carry a (1 - rbar) NUMERATOR as
+  # well as the (1 + (n-1)*rbar) denominator: the numerator corrects the
+  # downward bias in the cross-sectional sample variance under correlation,
+  # the denominator the inflated variance of the mean. The previous line kept
+  # only the denominator, which understates the correction -- with rbar = 0.616
+  # and n = 48 it returns t = -1.25 instead of the correct -0.77. The thesis
+  # (Sections 3.3 and 5.2) states the full formula, so the code was the odd one out.
+  t_adj   <- t_naive * sqrt((1 - rbar) / (1 + (n - 1) * rbar))
   cat("\n-- Cross-dependence-adjusted CAAR test (Kolari-Pynnonen) --\n")
   cat("avg pairwise AR correlation (rbar):", round(rbar, 3), "\n")
   cat("naive cross-sectional t:", round(t_naive, 2),

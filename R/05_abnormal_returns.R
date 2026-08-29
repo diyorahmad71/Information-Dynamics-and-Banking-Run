@@ -20,7 +20,16 @@ event_study <- function(ticker, evt_date) {
            AR  = R_i - E_R)
   n_days <- nrow(ew)
   CAR    <- sum(ew$AR)
-  t_stat <- CAR / (mm$sigma * sqrt(n_days))
+  # FIX (prediction-error term). Section 3.2 of the thesis defines the CAR
+  # standard deviation WITH the out-of-sample prediction-error correction,
+  # sigma_i * sqrt(n_days * (1 + 1/M)), and the Patell standardisation in
+  # R/06 already uses exactly that. This line used sigma_i * sqrt(n_days),
+  # dropping the (1 + 1/M) factor, so the per-bank t-statistics were slightly
+  # larger in absolute value than the stated formula implies. Now consistent
+  # with Section 3.2 and with R/06. (The factor is ~1.0026 at M = 190, so no
+  # significance verdict changes; it removes an internal inconsistency.)
+  se_car <- mm$sigma * sqrt(n_days * (1 + 1 / mm$n))
+  t_stat <- CAR / se_car
   list(
     ticker    = ticker,
     evt_date  = evt_date,

@@ -40,14 +40,21 @@ if (!is.na(returns_df$info_index[1]) &&
       by = "Date"
     ) %>%
     drop_na() %>%
+    # FIX (duplicated bank-dates). ew_all holds one row per (bank, date, EVENT).
+    # The four March event windows overlap on the calendar, so the SAME bank-day
+    # entered this panel once per containing window -- inflating N from ~697 to
+    # ~1,165 and re-weighting the estimator toward the most-overlapped dates. A
+    # bank's abnormal return on a given day is a single number; which window it
+    # came from does not change it. R/11 used to repair this after the fact;
+    # doing it here means the main pipeline reports the thesis's N = 697 directly.
+    distinct(ticker, Date, .keep_all = TRUE) %>%
     mutate(
       log_assets    = log(assets_bn),
       # Standardise info_index to [0,1] for coefficient interpretability
       info_std      = info_index / 100,
       uninsd_x_info = uninsured_dep_pct * info_std,
       assets_x_info = log_assets * info_std,
-      reg_x_info    = reg_exempt * info_std,
-      bank_date_id  = paste0(ticker, "_", event_id)
+      reg_x_info    = reg_exempt * info_std
     )
  
   if (nrow(panel_df) >= 20 && length(unique(panel_df$ticker)) >= 5) {
@@ -80,6 +87,44 @@ if (!is.na(returns_df$info_index[1]) &&
     cat("\nModel 3: Adding reg_exempt × InfoIndex\n")
     print(summary(m_panel_3))
  
+    # FIX (inference). With ~15 date clusters, asymptotic cluster-robust
+    # p-values over-reject badly (Cameron, Gelbach & Miller 2008), so the
+    # printed "twoway" p-values above must NOT be quoted. The wild cluster
+    # bootstrap below imposes the null and resamples by date; it is the basis
+    # for the p-values reported in Table 6. R/11 used to add this after the
+    # fact -- running it here means the main pipeline reports the right number.
+    wild_boot_p <- function(mod, data, param, cluster_var,
+                            B = 999, seed = 20230310) {
+      set.seed(seed)
+      t_obs    <- summary(mod)$coeftable[param, "t value"]
+      clusters <- unique(data[[cluster_var]])
+      resid_v  <- resid(mod); fitted_v <- fitted(mod)
+      yvar     <- as.character(formula(mod))[2]
+      boot_ts  <- numeric(B)
+      for (b in seq_len(B)) {
+        w <- sample(c(-1, 1), length(clusters), replace = TRUE)
+        names(w) <- as.character(clusters)
+        data_b <- data
+        data_b[[yvar]] <- fitted_v + resid_v * w[as.character(data[[cluster_var]])]
+        mod_b <- tryCatch(feols(formula(mod), data = data_b, vcov = "twoway"),
+                          error = function(e) NULL)
+        boot_ts[b] <- if (!is.null(mod_b)) summary(mod_b)$coeftable[param, "t value"] else NA
+      }
+      list(t_obs = t_obs, p = mean(abs(boot_ts) >= abs(t_obs), na.rm = TRUE))
+    }
+
+    cat("\n--- Wild cluster bootstrap by date, B = 999 (H0: gamma = 0) ---\n")
+    cat("    (this is the inference Table 6 reports; the asymptotic\n")
+    cat("     cluster-robust p-values above are unreliable at 15 clusters)\n")
+    cat("N =", nrow(panel_df), "bank-days |",
+        n_distinct(panel_df$ticker), "banks |",
+        n_distinct(panel_df$Date), "dates\n")
+    for (mn in c("m_panel_1", "m_panel_2", "m_panel_3")) {
+      bt <- wild_boot_p(get(mn), panel_df, "uninsd_x_info", "Date")
+      cat(sprintf("  %s : coef = %+.5f | t = %+.3f | bootstrap p = %.4f\n",
+                  mn, coef(get(mn))["uninsd_x_info"], bt$t_obs, bt$p))
+    }
+
     cat("\n--- Interpretation ---\n")
     cat("γ1 (UninsuredDep × Info): A negative coefficient means banks with\n")
     cat("  higher uninsured deposits suffer larger abnormal losses on high-\n")

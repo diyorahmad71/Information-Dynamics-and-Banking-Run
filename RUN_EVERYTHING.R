@@ -172,7 +172,8 @@ scripts <- c("R/00_packages.R", "R/01_settings_events.R", "R/02_data_download.R"
              "R/06b_ff3_robustness.R", "R/07_google_trends.R",
              "R/08_cross_sectional_regression.R", "R/08b_calendar_time_portfolio.R",
              "R/08c_panel_fixed_effects.R", "R/08d_robustness_extra.R",
-             "R/09_plots.R", "R/10_save_results.R", "R/11_corrections.R")
+             "R/09_plots.R", "R/10_save_results.R", "R/11_corrections.R",
+             "13_test_fixes.R")
 
 failed <- character(0)
 for (s in scripts) {

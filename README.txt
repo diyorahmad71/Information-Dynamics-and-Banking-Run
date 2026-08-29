@@ -1,13 +1,13 @@
 DATA FILES USED BY THE SCRIPTS
 ==============================
 The loader in R/02_data_download.R tries, for each ticker, in order:
-  1. a local CSV in this data/ folder (or the project root): TICKER.csv
+  1. a local CSV in the project root (or in a data/ subfolder): TICKER.csv
   2. Yahoo Finance (still-listed tickers)
   3. Stooq (free; keeps DELISTED tickers), with retries for its daily limit
-A local CSV always wins, so dropping a file here makes that ticker
-reproducible and immune to rate limits.
+A local CSV always wins, so dropping a file beside this one makes that
+ticker reproducible and immune to rate limits.
 
-Yahoo-format columns expected in any CSV you place here:
+Yahoo-format columns expected in any CSV you add:
   Date, Open, High, Low, Close, Adj Close, Volume
 
 1. Delisted / retired tickers -- provide as CSV if the automatic

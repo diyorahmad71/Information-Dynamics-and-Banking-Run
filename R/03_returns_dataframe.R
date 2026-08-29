@@ -5,16 +5,27 @@
 # =====================================================================
 
 # ── 3. BUILD RETURNS DATA FRAME ──────────────────────────────
-prices_xts <- do.call(merge,
+# FIX 19: difference each ticker on ITS OWN observed prices, then merge.
+# The old code merged the price levels first and differenced the aligned
+# matrix, so a bank that was halted and later resumed lost the return across
+# the halt. First Republic was suspended on 1 May 2023 and resumed over the
+# counter on 3 May at $0.33 from $3.51, and that -234% abnormal return -- the
+# largest single observation in the study, and the whole content of Event 5 --
+# was silently dropped. It took the Event 5 CAAR from -14.35% to -9.26% and
+# one row out of the attention panel (697 -> 696). Differencing per ticker
+# makes the resumption-day return span the halt, which is the correct
+# treatment and the one Section 3.2 of the thesis describes.
+log_ret <- do.call(merge,
   lapply(available, function(t) {
     px <- Ad(get(t))
-    colnames(px) <- t
-    px
+    px <- px[!is.na(px)]          # <- the fix: drop gaps BEFORE differencing
+    r  <- diff(log(px))
+    colnames(r) <- t
+    r
   })
 )
  
 market_xts <- Ad(GSPC); colnames(market_xts) <- "Market"
-log_ret    <- diff(log(prices_xts))
 market_ret <- diff(log(market_xts))
  
 # Only drop rows where S&P500 is NA — NOT where individual stocks are NA

@@ -106,11 +106,26 @@ for (t in TICKERS) {
 }
 
 # S&P 500 market index
-suppressWarnings(
-  getSymbols("^GSPC", src = "yahoo",
-             from = START_DATE, to = END_DATE,
-             auto.assign = TRUE)
-)
+# FIX (no fallback for the benchmark). Every one of the 48 stocks has a
+# three-way loader (local CSV -> Yahoo -> Stooq), but the market index had
+# only Yahoo, and the call was wrapped in suppressWarnings() rather than
+# tryCatch(). So a Yahoo outage or rate-limit killed the entire run at this
+# line even when all 48 stock CSVs were sitting on disk. The index now takes
+# a local GSPC.csv first, exactly like the stocks, and only then tries Yahoo.
+if (!load_csv("GSPC")) {
+  ok_mkt <- tryCatch({
+    suppressWarnings(
+      getSymbols("^GSPC", src = "yahoo",
+                 from = START_DATE, to = END_DATE,
+                 auto.assign = TRUE)
+    )
+    TRUE
+  }, error = function(e) {
+    message("  ✗ ^GSPC download failed: ", e$message); FALSE
+  })
+  if (!isTRUE(ok_mkt))
+    stop("No market index. Place a Yahoo-format GSPC.csv in data/ and re-run.")
+}
 message("✓ ^GSPC — S&P 500 market index\n")
  
 missing_tickers <- setdiff(TICKERS, available)

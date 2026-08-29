@@ -9,8 +9,10 @@
 #           (2) fall back to gtrendsR API pull,
 #           (3) if both fail, set info_index = NA and continue.
 #
-# CSV files: download from trends.google.com for each keyword,
-# date range Jan 1 – Jun 30 2023, US region, weekly frequency.
+# CSV files: downloaded from trends.google.com for BOTH keywords in a single
+# query (so they share one scale), worldwide, date range Jan 1 - Jun 30 2023,
+# daily frequency. The old comment here said "US region, weekly frequency",
+# which matched neither the bundled files nor Sections 3.6 and 4.4.
 # Expected files in working directory:
 #   google_trends_svb.csv     — contains "svb" column
 #   google_trends_bankrun.csv — contains "Bank run" column
@@ -18,7 +20,11 @@
 # Actual files used: provided by author from Google Trends download.
 message("\nLoading Google Trends data...")
  
-gt_keywords <- c("SVB", "bank run", "FDIC insurance", "Silicon Valley Bank")
+# FIX (keywords). The thesis (Sections 3.6 and 4.4) builds the composite from
+# exactly two terms, and the bundled CSVs contain those two. This vector listed
+# four, so if the API fallback ever fired it would have built a FOUR-keyword
+# index while the text described a two-keyword one.
+gt_keywords <- c("SVB", "bank run")
 gt_long     <- NULL
 info_df     <- NULL
 returns_df$info_index <- NA_real_
@@ -26,8 +32,18 @@ returns_df$info_index <- NA_real_
 # ── 7a. LOAD FROM CSV FILES (primary source) ──────────────────
 # These CSV files were downloaded directly from trends.google.com
 # and contain actual search interest data for the crisis period.
-csv_svb_path     <- "data/google_trends_svb.csv"
-csv_bankrun_path <- "data/google_trends_bankrun.csv"
+# FIX (paths). These looked only in data/, but the repository ships the two
+# CSVs in the project ROOT and has no data/ directory, so on a fresh clone the
+# files were never found and the loader fell through to the gtrendsR API --
+# which needs a live connection and returns a differently-scaled series.
+# Now checks ./ and data/, exactly as load_csv() in R/02 already does.
+find_data <- function(fname) {
+  cand <- c(fname, file.path("data", fname))
+  hit  <- cand[file.exists(cand)]
+  if (length(hit)) hit[1] else cand[1]
+}
+csv_svb_path     <- find_data("google_trends_svb.csv")
+csv_bankrun_path <- find_data("google_trends_bankrun.csv")
  
 csv_loaded <- FALSE
 tryCatch({
@@ -42,7 +58,18 @@ tryCatch({
       rename(Date = time, hits = svb) %>%
       mutate(Date = as.Date(Date), hits = as.numeric(hits),
              keyword = "SVB",
-             hits_scaled = hits / max(hits, na.rm = TRUE) * 100)
+             # FIX (shared scale). The two CSVs come from ONE Google Trends
+             # query, so they already share a single scale: 'SVB' peaks at 100
+             # and 'bank run' at 7, meaning 'bank run' volume is about 7% of
+             # 'SVB' volume at the peak. Re-normalising each series to its own
+             # maximum -- which this line used to do -- throws that away and
+             # silently inflates 'bank run' roughly fourteen-fold, giving the
+             # rarer term equal weight in the composite. Section 4.4 of the
+             # thesis describes the shared-scale version (unscaled average of
+             # 53.5 at the peak, ~2.5 on 1 May, ~40x below peak); the previous
+             # code produced 100, 3.35 and ~30x instead. Keep the series as
+             # downloaded and rescale ONLY the composite, below.
+             hits_scaled = hits)
  
     # File 2: Bank run search interest
     raw_br <- read_csv(csv_bankrun_path, skip = 0, show_col_types = FALSE)
@@ -54,26 +81,38 @@ tryCatch({
       rename(Date = time, hits = all_of(br_col)) %>%
       mutate(Date = as.Date(Date), hits = as.numeric(hits),
              keyword = "bank run",
-             hits_scaled = hits / max(hits, na.rm = TRUE) * 100)
+             hits_scaled = hits)   # FIX: keep the shared Trends scale (see above)
  
     # Combine into gt_long
     gt_long <<- bind_rows(svb_df, bankrun_df) %>%
       filter(!is.na(hits))
  
-    # Build composite info_index (average of both series per week)
+    # Build the composite information index: equally weighted average of the
+    # two series AS DOWNLOADED (they share one Trends scale), then rescale so
+    # the composite's own peak equals 100. This is what Section 4.4 describes.
     info_df <<- gt_long %>%
       group_by(Date) %>%
       summarise(info_index = mean(hits_scaled, na.rm = TRUE), .groups = "drop") %>%
       mutate(info_index = info_index / max(info_index, na.rm = TRUE) * 100)
- 
-    # Join to returns_df (weekly → fill forward to match daily returns)
+
+    # Join to returns_df. The bundled extracts are DAILY over Jan-Jun 2023, so
+    # the fill below is a no-op guard for any gap (e.g. a market holiday that
+    # Trends does report); it is not a weekly-to-daily expansion.
+    # FIX (column collision -- this one silently disabled the whole CSV path).
+    # Line 24 above pre-creates returns_df$info_index as NA. Joining a second
+    # info_index on top produced info_index.x / info_index.y, so the fill()
+    # below then failed with "Column `info_index` doesn't exist" -- caught by
+    # the enclosing tryCatch, which reported an EMPTY message and fell through
+    # to the API. Net effect: the bundled CSVs were never used. Drop the
+    # placeholder before joining.
     returns_df <<- returns_df %>%
+      select(-any_of("info_index")) %>%
       left_join(info_df, by = "Date") %>%
       arrange(Date) %>%
       fill(info_index, .direction = "down")
- 
+
     message("  ✓ Google Trends loaded from CSV: SVB + Bank Run (",
-            nrow(gt_long), " weekly observations)")
+            nrow(gt_long), " daily observations across both keywords)")
     csv_loaded <<- TRUE
  
   } else {
@@ -87,17 +126,20 @@ tryCatch({
 if (!csv_loaded) {
   message("  Trying gtrendsR API...")
   tryCatch({
-    trends_list <- map(gt_keywords, function(kw) {
+    # FIX (one query, worldwide). Two changes here. (1) Both keywords now go in
+    # a SINGLE gtrends call, so Google returns them on one shared scale, exactly
+    # as the bundled CSVs are. Querying them separately -- as this did -- gives
+    # each series its own 0-100 scale and hands the rarer term equal weight in
+    # the composite. (2) geo is now "" (worldwide) rather than "US", because
+    # Sections 3.6 and 4.4 describe a worldwide series and treat that as one of
+    # the design's stated limitations.
+    trends_list <- list(tryCatch({
       Sys.sleep(1)
-      res <- tryCatch(
-        gtrends(keyword = kw, geo = "US",
-                time = "2023-01-01 2023-06-30",
-                onlyInterest = TRUE)$interest_over_time,
-        error = function(e) { message("  x '", kw, "': ", e$message); NULL }
-      )
-    if (is.null(res)) return(NULL)
-    res %>% mutate(hits = as.character(hits))  # force consistent type
-  })
+      gtrends(keyword = gt_keywords, geo = "",
+              time = "2023-01-01 2023-06-30",
+              onlyInterest = TRUE)$interest_over_time %>%
+        mutate(hits = as.character(hits))       # force consistent type
+    }, error = function(e) { message("  x Trends pull failed: ", e$message); NULL }))
  
   trends_ok <- Filter(Negate(is.null), trends_list)
   if (length(trends_ok) == 0) stop("All keyword pulls failed")
@@ -110,8 +152,9 @@ if (!csv_loaded) {
     select(Date, keyword, hits) %>%
     group_by(Date, keyword) %>%
     summarise(hits = mean(hits, na.rm = TRUE), .groups = "drop") %>%
-    group_by(keyword) %>%
-    mutate(hits_scaled = hits / max(hits, na.rm = TRUE) * 100) %>%
+    # FIX: one query means one shared scale, so do NOT re-normalise per keyword
+    # (see the CSV branch above for why that matters).
+    mutate(hits_scaled = hits) %>%
     ungroup()
  
   info_df <<- gt_long %>%
@@ -120,6 +163,7 @@ if (!csv_loaded) {
     mutate(info_index = info_index / max(info_index, na.rm = TRUE) * 100)
  
   returns_df <<- returns_df %>%
+    select(-any_of("info_index")) %>%          # FIX: see the CSV branch above
     left_join(info_df, by = "Date") %>%
     arrange(Date) %>%
     fill(info_index, .direction = "down")

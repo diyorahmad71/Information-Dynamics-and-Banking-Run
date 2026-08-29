@@ -56,6 +56,10 @@ write_yahoo <- function(df, ticker) {
               Close     = Close,
               `Adj Close` = Close,
               Volume    = ifelse(is.na(Volume), 0, Volume))
+  # FIX: create data/ if it is absent. The repository ships without that
+  # directory, so write_csv() here failed with "No such file or directory"
+  # on a fresh clone before anything else could run.
+  dir.create("data", showWarnings = FALSE, recursive = TRUE)
   f <- file.path("data", paste0(ticker, ".csv"))
   write_csv(out, f)
   cat(sprintf("\n  wrote %s  |  %d rows  |  %s to %s\n",

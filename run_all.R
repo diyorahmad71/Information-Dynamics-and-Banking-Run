@@ -40,7 +40,8 @@ scripts <- c(
   "R/08d_robustness_extra.R",
   "R/09_plots.R",
   "R/10_save_results.R",
-  "R/11_corrections.R"
+  "R/11_corrections.R",
+  "13_test_fixes.R"      # base-R regression tests for the fixes (see FIXES.md)
 )
 
 for (s in scripts) {

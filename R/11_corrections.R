@@ -111,7 +111,13 @@ for (mod_name in c("m1", "m2", "m3")) {
 cat("\n\n--- FIX 2: calendar-time portfolio (correct specification) ---\n")
 
 # Equal-weighted portfolio of RAW returns for banks in an event window
+# FIX: deduplicate bank-dates before averaging. ew_all carries one row per
+# (bank, date, EVENT), so the overlapping March windows repeat the same
+# bank-day. The mean happens to be unaffected while every bank is duplicated
+# the same number of times on a given date, but that is a coincidence of this
+# sample, not a property of the estimator, and n_banks was inflated by it.
 port <- ew_all %>%
+  distinct(ticker, Date, .keep_all = TRUE) %>%
   group_by(Date) %>%
   summarise(port_R = mean(R_i, na.rm = TRUE),
             Market = mean(R_m, na.rm = TRUE),
@@ -126,8 +132,13 @@ print(ct_hac)
 a  <- coef(ct_reg)[1]; se <- ct_hac[1, 2]
 cat(sprintf("\nDaily abnormal return alpha_p = %.5f (%.3f%%)\n", a, 100 * a))
 cat(sprintf("t = %.3f | p = %.4f\n", ct_hac[1, 3], ct_hac[1, 4]))
-cat(sprintf("Implied 5-day CAAR = %.2f%%  [95%% CI %.2f%% to %.2f%%]\n",
-            500 * a, 500 * (a - 1.96 * se), 500 * (a + 1.96 * se)))
+# FIX: use the t critical value for the regression's own degrees of freedom.
+# The interval is built on ~15 daily observations, so the normal value of 1.96
+# is too narrow; with 13 d.o.f. the correct multiplier is about 2.16.
+tcrit <- qt(0.975, df = df.residual(ct_reg))
+cat(sprintf("Implied 5-day CAAR = %.2f%%  [95%% CI %.2f%% to %.2f%%]  (t crit = %.3f on %d d.f.)\n",
+            500 * a, 500 * (a - tcrit * se), 500 * (a + tcrit * se),
+            tcrit, df.residual(ct_reg)))
 
 # For comparison: the OLD (incorrect) 5-observation t-test
 old <- ew_all %>% filter(event_id == 2) %>% group_by(day) %>%

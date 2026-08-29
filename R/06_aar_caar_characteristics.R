@@ -16,12 +16,22 @@ AAR_table <- ew_all %>%
             n    = n(), .groups = "drop") %>%
   group_by(event_id) %>%
   mutate(CAAR = cumsum(AAR),
-         sig  = case_when(abs(t) > 2.576 ~ "***",
-                          abs(t) > 1.960 ~ "**",
-                          abs(t) > 1.645 ~ "*",
-                          TRUE           ~ "")) %>%
+         # FIX (significance stars). The old code compared |t| against
+         # 2.576 / 1.960 / 1.645 -- the 1% / 5% / 10% NORMAL critical values --
+         # but the thesis legend for Table 4 reads *** p<0.001, ** p<0.01,
+         # * p<0.05, . p<0.10. The two disagree: day 0 (t = -2.52) printed
+         # "**" here but "*" in the thesis, and day +2 (t = +2.59) printed
+         # "***" here but "*" in the thesis. Stars are now derived from the
+         # p-value on a t distribution with n-1 df, which reproduces Table 4.
+         p    = 2 * pt(-abs(t), df = pmax(n - 1, 1)),
+         sig  = case_when(p < 0.001 ~ "***",
+                          p < 0.01  ~ "**",
+                          p < 0.05  ~ "*",
+                          p < 0.10  ~ ".",
+                          TRUE      ~ "")) %>%
   ungroup() %>%
-  mutate(across(c(AAR, se, CAAR), ~ round(.x * 100, 3)))
+  mutate(p = round(p, 4),
+         across(c(AAR, se, CAAR), ~ round(.x * 100, 3)))
  
 cat("\n=== AAR / CAAR TABLE ===\n")
 print(AAR_table)
@@ -135,7 +145,19 @@ if (file.exists("kbw_bank_chars.csv")) {
 }
  
 # ── Combine core + KBW, print summary ────────────────────────
+# FIX (duplicated banks -- this one changed N). bind_rows() stacked the 14-bank
+# hand-checked core table on top of the 46-bank KBW CSV without deduplicating,
+# and 12 tickers appear in BOTH (every core bank except PACW and CMA, which the
+# CSV does not carry). The result was 60 rows for 48 banks, so the cross-sectional
+# regression in R/08 ran with SIVB, SBNY, FRC, ZION, WAL, KEY, RF, JPM, BAC, WFC,
+# USB and TFC each counted TWICE -- exactly the banks that drive the result.
+# Verified live: N was 60 before this fix and 48 after. Table 5 reports N = 48, so
+# the thesis's numbers cannot have come from this path; 12_verify_n48.R applies
+# distinct() and is presumably where they came from.
+# distinct() keeps the FIRST match, i.e. the hand-checked core values, which is
+# the intended precedence (Section 4.3 sources PACW and CMA that way).
 bank_chars <- bind_rows(bank_chars_core, bank_chars_kbw) %>%
+  distinct(ticker, .keep_all = TRUE) %>%
   filter(ticker %in% available)
  
 message("  Bank characteristics: ", nrow(bank_chars),

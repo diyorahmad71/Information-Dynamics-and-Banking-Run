@@ -249,10 +249,12 @@ rbar <- ew2 %>% select(ticker, day, AR) %>%
   select(-day) %>% cor(use = "pairwise.complete.obs")
 rbar <- mean(rbar[upper.tri(rbar)], na.rm = TRUE)
 t_naive <- mean(car2) / (sd(car2) / sqrt(length(car2)))
-t_kp    <- t_naive / sqrt(1 + (length(car2) - 1) * rbar)
+t_kp    <- t_naive * sqrt((1 - rbar) / (1 + (length(car2) - 1) * rbar))  # FIX: full KP formula
 cat(sprintf("\n  mean pairwise AR correlation = %.3f   (thesis: 0.62)\n", rbar))
 cat(sprintf("  naive cross-sectional t = %.2f  ->  Kolari-Pynnonen t = %.2f\n",
             t_naive, t_kp))
-cat("    (thesis: -6.49 -> -1.21, on 46 banks)\n")
+cat("    (thesis reports -6.82 -> -0.77 on 48 banks; the older -6.49 -> -1.21\n",
+    "     came from the 46-bank run AND from the incomplete KP formula that\n",
+    "     omitted the (1 - rbar) numerator -- both are now fixed.)\n")
 
 cat("\n\n=============== END -- SEND ME EVERYTHING ABOVE ===============\n")
