@@ -55,3 +55,31 @@ Then:
 Bank characteristics for PACW and CMA are ALREADY hard-coded in
 R/06_aar_caar_characteristics.R (bank_chars_core), so nothing needs
 adding there.
+
+--------------------------------------------------------------------
+WBS.csv -- WEBSTER FINANCIAL (added September 2026)
+--------------------------------------------------------------------
+data/WBS.csv is committed because Yahoo Finance repeatedly refused to
+return this ticker. It failed twice on 6 September 2026, and each time
+the run silently fell to 47 banks instead of 48, which moved the
+bottom-quintile p-value from 0.911 to 0.567 and the panel from 697 to
+682 rows. Committing the series makes the sample deterministic.
+
+Source: Investing.com -> "Webster Financial" -> Historical Data,
+2022-03-01 to 2023-10-31, converted into the Yahoo column layout. The
+raw export is kept at:
+
+  data/raw/Webster Financial Stock Price History.csv
+
+(Files in data/raw/ are gitignored and not redistributed.)
+
+CAVEAT, same as PACW: these are split-adjusted but NOT
+dividend-adjusted closes, whereas the thesis's original WBS series came
+from Yahoo's Adj Close. No ex-dividend date falls inside 8-15 March
+2023, so the Event 2 CAR is unaffected, but alpha and beta are
+estimated over ~200 days that do contain ex-dividend dates and may
+differ marginally from the published estimates.
+
+CHECK AFTER RUNNING: Table C.4 of the thesis reports WBS at -22.0%.
+If a run returns a materially different figure, the price source is not
+equivalent to the original and the Yahoo series should be preferred.
