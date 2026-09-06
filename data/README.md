@@ -35,22 +35,12 @@ Yahoo-format columns expected in any CSV you add:
 --------------------------------------------------------------------
 N = 48 RE-RUN (added August 2026)
 --------------------------------------------------------------------
-To bring PacWest and Comerica into the analysis you need two more
-price files in this folder:
+PacWest and Comerica are COMMITTED as data/PACW.csv and data/CMA.csv, so a
+fresh clone reproduces all 48 banks with no manual downloads.
 
-  data/PACW.csv   and   data/CMA.csv
-
-Do NOT create these by hand. Run, from the project root:
-
-  source("00_prepare_pacw_cma.R")
-
-It converts the raw investing.com and MacroTrends downloads into the
-Yahoo-style layout that R/02_data_download.R expects, and prints a
-coverage check.
-
-Then:
-  source("run_all.R")
-  source("12_verify_n48.R")
+They were built by 00_prepare_pacw_cma.R from the raw exports named
+above, which live in data/raw/ and are not redistributed. Run that
+script only if you want to rebuild them from source.
 
 Bank characteristics for PACW and CMA are ALREADY hard-coded in
 R/06_aar_caar_characteristics.R (bank_chars_core), so nothing needs

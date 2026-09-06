@@ -80,14 +80,11 @@ the project root, then:
 source("RUN_EVERYTHING.R")
 ```
 
-First run only, to build the two price files that are not committed:
-
-```r
-source("00_prepare_pacw_cma.R")
-```
-
-That needs two raw downloads in `data/raw/` — see [`data/README.md`](data/README.md) for
-the exact sources. Without them `12_verify_n48.R` stops immediately.
+Every price file the analysis needs is committed, so a fresh clone reproduces the
+published results without any manual downloads. `00_prepare_pacw_cma.R` is kept for
+provenance: it is the script that built `data/PACW.csv` and `data/CMA.csv` from the raw
+exports described in [`data/README.md`](data/README.md), and you only need to run it if
+you want to rebuild them from source.
 
 ### Check the sample size before trusting a run
 
