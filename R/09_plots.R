@@ -25,7 +25,7 @@ p1 <- AAR_table %>%
   theme_minimal(base_size = 13) +
   theme(legend.position = "bottom", legend.text = element_text(size = 8))
 print(p1)
-ggsave("CAAR_plot.png", p1, width = 10, height = 6, dpi = 300)
+ggsave("output/CAAR_plot.png", p1, width = 10, height = 6, dpi = 300)
 message("  ✓ CAAR_plot.png saved")
  
 # Plot 2 — CAR by bank at Event 2
@@ -47,7 +47,7 @@ p2 <- results_summary %>%
        x = NULL, y = "CAR (%)", fill = "Bank Group") +
   theme_minimal(base_size = 11)
 print(p2)
-ggsave("CAR_by_bank_E2.png", p2, width = 9, height = 8, dpi = 300)
+ggsave("output/CAR_by_bank_E2.png", p2, width = 9, height = 8, dpi = 300)
 message("  ✓ CAR_by_bank_E2.png saved")
  
 # Plot 3 — Uninsured deposits vs CAR scatter
@@ -67,7 +67,7 @@ p3 <- reg_df %>%
   ) +
   theme_minimal(base_size = 13)
 print(p3)
-ggsave("uninsured_vs_CAR.png", p3, width = 9, height = 6, dpi = 300)
+ggsave("output/uninsured_vs_CAR.png", p3, width = 9, height = 6, dpi = 300)
 message("  ✓ uninsured_vs_CAR.png saved")
  
 # Plot 4 — Calendar-time portfolio
@@ -88,7 +88,7 @@ p_ct <- ct_portfolio %>%
   ) +
   theme_minimal(base_size = 13)
 print(p_ct)
-ggsave("calendar_time_portfolio.png", p_ct, width = 9, height = 5, dpi = 300)
+ggsave("output/calendar_time_portfolio.png", p_ct, width = 9, height = 5, dpi = 300)
 message("  ✓ calendar_time_portfolio.png saved")
  
 # Plot 5 — Google Trends (daily if available)
@@ -120,6 +120,6 @@ if (!is.null(gt_long) && !all(is.na(returns_df$info_index))) {
     theme(legend.position = "bottom", legend.box = "vertical",
           legend.text = element_text(size = 8))
   print(p5)
-  ggsave("google_trends_info.png", p5, width = 11, height = 6, dpi = 300)
+  ggsave("output/google_trends_info.png", p5, width = 11, height = 6, dpi = 300)
   message("  ✓ google_trends_info.png saved")
 }

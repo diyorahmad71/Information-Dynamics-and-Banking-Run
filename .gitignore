@@ -1,0 +1,19 @@
+# R
+.Rhistory
+.Rapp.history
+.RData
+.Rproj.user/
+.Ruserdata
+
+# macOS / editors
+.DS_Store
+.vscode/
+*~
+
+# Raw price downloads: sources documented in data/README.md, files not redistributed
+data/raw/*
+!data/raw/.gitkeep
+
+# Generated from the raw downloads by 00_prepare_pacw_cma.R
+data/PACW.csv
+data/CMA.csv

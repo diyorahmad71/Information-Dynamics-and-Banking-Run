@@ -1,0 +1,654 @@
+run started: 2026-09-06 08:09:15 
+R version 4.6.0 (2026-04-24) | Darwin 
+
+
+################ STEP 1: PACW / CMA PRICE FILES ################
+  PACW raw columns: Date | Price | Open | High | Low | Vol. | Change % 
+  wrote data/PACW.csv     442 rows   2022-03-01 .. 2023-11-30
+  wrote data/CMA.csv      501 rows   2022-01-03 .. 2023-12-29
+
+  coverage (need first obs on or before 2022-05-05 for a full
+   [-210,-11] estimation window at Event 2):
+    PACW  first 2022-03-01  OK                224 obs in estimation range
+      event window 8-15 Mar: 6 trading days
+    CMA   first 2022-01-03  OK                224 obs in estimation range
+      event window 8-15 Mar: 6 trading days
+
+  NOTE: PacWest closes from investing.com are split-adjusted but NOT
+  dividend-adjusted, unlike the Yahoo Adj Close used for every other
+  bank. No ex-div date falls in 8-15 Mar 2023 so the CAR is unaffected,
+  but alpha/beta are estimated over days that do. Disclose in Sec 4.1.
+
+
+################ STEP 2: FULL PIPELINE ################
+
+-----  R/00_packages.R  -----
+
+-----  R/01_settings_events.R  -----
+
+-----  R/02_data_download.R  -----
+=== Download Summary ===
+Available ( 47 ): SIVB SBNY FRC ZION WAL PACW CMA KEY RF JPM BAC WFC USB TFC FITB HBAN CFG FHN COLB OZK WTFC BOKF UMBF VLY HWC EWBC CBSH FFBC PB TCBI ONB UBSI GBCI INDB WSFS BANR FFIN TRMK SFNC HAFC CVBF RNST WAFD CATY EBC GABC IBCP 
+MISSING   ( 7 ): SNV NYCB WBS HTLF VBTX FBMS HTBK 
+========================
+
+
+-----  R/03_returns_dataframe.R  -----
+Returns data:  311 trading days, 48 series
+
+
+-----  R/04_market_model.R  -----
+
+-----  R/05_abnormal_returns.R  -----
+
+=== EVENT STUDY RESULTS ===
+# A tibble: 235 × 6
+   ticker event_id CAR_pct t_stat p_value sig  
+   <chr>     <dbl> <chr>    <dbl>   <dbl> <lgl>
+ 1 SIVB          1 -92.11% -13.5   0      TRUE 
+ 2 SBNY          1 -38.51%  -7.53  0      TRUE 
+ 3 FRC           1 -34.49%  -8.95  0      TRUE 
+ 4 ZION          1 -14.56%  -4.68  0      TRUE 
+ 5 WAL           1 -36%     -9.86  0      TRUE 
+ 6 PACW          1 -73.74% -20.2   0      TRUE 
+ 7 CMA           1 -11.53%  -3.40  0.0008 TRUE 
+ 8 KEY           1 -10.54%  -3.39  0.0008 TRUE 
+ 9 RF            1 -9.03%   -2.96  0.0034 TRUE 
+10 JPM           1 -3.72%   -1.45  0.148  FALSE
+# ℹ 225 more rows
+# ℹ Use `print(n = ...)` to see more rows
+
+-----  R/06_aar_caar_characteristics.R  -----
+
+=== AAR / CAAR TABLE ===
+# A tibble: 25 × 9
+   event_id   day     AAR    se      t     n    CAAR      p sig  
+      <dbl> <int>   <dbl> <dbl>  <dbl> <int>   <dbl>  <dbl> <chr>
+ 1        1    -2  -0.925 0.15   -6.15    47  -0.925 0      ***  
+ 2        1    -1  -1.92  0.156 -12.3     47  -2.84  0      ***  
+ 3        1     0  -0.545 0.127  -4.27    47  -3.39  0.0001 ***  
+ 4        1     1  -7.51  1.87   -4.02    47 -10.9   0.0002 ***  
+ 5        1     2  -2.98  1.21   -2.46    46 -13.9   0.0177 *    
+ 6        2    -2  -0.545 0.127  -4.28    47  -0.545 0.0001 ***  
+ 7        2    -1  -7.5   1.87   -4.02    47  -8.04  0.0002 ***  
+ 8        2     0  -2.97  1.21   -2.46    46 -11.0   0.0179 *    
+ 9        2     1 -13.5   2.55   -5.29    45 -24.5   0      ***  
+10        2     2   2.20  0.879   2.50    45 -22.3   0.0161 *    
+# ℹ 15 more rows
+# ℹ Use `print(n = ...)` to see more rows
+
+=== PATELL Z-STATISTICS ===
+# A tibble: 5 × 4
+  event_id CAAR_pct Patell_Z p_value
+     <dbl> <chr>       <dbl>   <dbl>
+1        1 -13.81%     -27.6       0
+2        2 -21.78%     -46.7       0
+3        3 -22.66%     -50.2       0
+4        4 -15.98%     -36.3       0
+5        5 -13.85%     -14.1       0
+# A tibble: 47 × 5
+   ticker assets_bn uninsured_dep_pct tier1_lev ltd_ratio
+   <chr>      <dbl>             <dbl>     <dbl>     <dbl>
+ 1 SIVB       209                94.3      7.96      42  
+ 2 SBNY       110.               89.3      8.79      83.9
+ 3 FRC        213.               67.3      8.51      94.1
+ 4 ZION        89.5              49.2      7.65      76.5
+ 5 WAL         67.7              52.6      8.22      98.7
+ 6 PACW        44.3              71.1      9.7       84.4
+ 7 CMA         85.5              59.3      9.01      71.9
+ 8 KEY        188.               48.2      8.78      81.8
+ 9 RF         154.               34.8      8.8       71.7
+10 JPM       3202.               59.5      8.3       46.1
+# ℹ 37 more rows
+# ℹ Use `print(n = ...)` to see more rows
+
+=== BANK CHARACTERISTICS (with regulatory dummies) ===
+# A tibble: 47 × 7
+   ticker assets_bn uninsured_dep_pct tier1_lev ltd_ratio reg_exempt  gsib
+   <chr>      <dbl>             <dbl>     <dbl>     <dbl>      <int> <int>
+ 1 SIVB       209                94.3      7.96      42            0     0
+ 2 SBNY       110.               89.3      8.79      83.9          0     0
+ 3 FRC        213.               67.3      8.51      94.1          0     0
+ 4 ZION        89.5              49.2      7.65      76.5          1     0
+ 5 WAL         67.7              52.6      8.22      98.7          1     0
+ 6 PACW        44.3              71.1      9.7       84.4          1     0
+ 7 CMA         85.5              59.3      9.01      71.9          1     0
+ 8 KEY        188.               48.2      8.78      81.8          0     0
+ 9 RF         154.               34.8      8.8       71.7          0     0
+10 JPM       3202.               59.5      8.3       46.1          0     1
+# ℹ 37 more rows
+# ℹ Use `print(n = ...)` to see more rows
+
+-----  R/06b_ff3_robustness.R  -----
+
+=== CAPM vs FF3 COMPARISON (Event 2) ===
+CAR_raw  = raw-return market model of R/05 (this is what Table 3 reports)
+CAR_capm = excess-return CAPM, the like-for-like benchmark Table C.5 describes
+CAR_ff3  = Fama-French three factor
+Diff     = FF3 minus excess-return CAPM, in percentage points
+
+# A tibble: 47 × 7
+   ticker CAR_raw_pct CAR_capm_pct  t_capm CAR_ff3_pct  t_ff3 CAR_diff_pp
+   <chr>  <chr>       <chr>          <dbl> <chr>        <dbl>       <dbl>
+ 1 SIVB   -89%        -88.62%      -18.8   -88.4%      -19.3         0.22
+ 2 SBNY   -33.82%     -33.08%       -8.70  -30.33%      -8.41        2.75
+ 3 FRC    -104.5%     -103.83%     -27.4   -102.06%    -27.3         1.77
+ 4 ZION   -37.38%     -36.84%      -11.9   -31.43%     -11.3         5.41
+ 5 WAL    -85.35%     -84.59%      -23.9   -79.63%     -23.7         4.96
+ 6 PACW   -69.07%     -68.35%      -19.1   -61.66%     -19.0         6.69
+ 7 CMA    -38.92%     -38.43%      -11.3   -33.31%     -10.7         5.12
+ 8 KEY    -34.66%     -34.12%      -11.0   -29.43%     -10.4         4.69
+ 9 RF     -14.45%     -13.98%       -4.61  -7.93%       -3.05        6.05
+10 JPM    -1.9%       -1.53%        -0.589 1.61%         0.71        3.14
+# ℹ 37 more rows
+# ℹ Use `print(n = ...)` to see more rows
+
+Correlation of raw-return and FF3 CARs (Table 3 vs FF3): 0.9982 
+Mean CAR: raw -21.78 % | FF3 -16.86 %
+Rank reversals between raw and FF3 orderings: 29 of 47 banks
+  (Section 5.5 claims the ordering is 'broadly' preserved -- this line
+   reports exactly how broadly, so the wording can be checked.)
+
+-----  R/07_google_trends.R  -----
+
+-----  R/08_cross_sectional_regression.R  -----
+
+=== CROSS-SECTIONAL REGRESSION (Event 2) ===
+N = 47 banks
+
+--- Full model (HC3 robust SEs) ---
+
+t test of coefficients:
+
+                    Estimate Std. Error t value Pr(>|t|)  
+(Intercept)       -0.0088179  0.6240802 -0.0141   0.9888  
+uninsured_dep_pct -0.0114387  0.0045428 -2.5180   0.0157 *
+log(assets_bn)     0.0115684  0.0224776  0.5147   0.6095  
+tier1_lev          0.0629871  0.0541750  1.1627   0.2515  
+ltd_ratio         -0.0039728  0.0027467 -1.4464   0.1555  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+R-squared: 0.532 
+
+--- Parsimonious model (HC3 robust SEs) ---
+
+t test of coefficients:
+
+                    Estimate Std. Error t value Pr(>|t|)   
+(Intercept)        0.2853123  0.1442525  1.9779  0.05423 . 
+uninsured_dep_pct -0.0111675  0.0036527 -3.0574  0.00379 **
+log(assets_bn)     0.0011703  0.0209152  0.0560  0.95563   
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+R-squared: 0.449 
+
+--- Regulatory model: with EGRRCPA exempt dummy + G-SIB dummy (HC3) ---
+(reg_exempt=1: assets < $100B; exempt from 2018 EGRRCPA enhanced standards)
+(gsib=1: assets > $700B; JPM, BAC, WFC = Global Systemically Important Banks)
+
+t test of coefficients:
+
+                    Estimate Std. Error t value Pr(>|t|)  
+(Intercept)        0.3862462  0.2173740  1.7769  0.08283 .
+uninsured_dep_pct -0.0097512  0.0036227 -2.6917  0.01016 *
+log(assets_bn)    -0.0429263  0.0441971 -0.9712  0.33699  
+reg_exempt        -0.0106543  0.1324826 -0.0804  0.93628  
+gsib               0.3282857  0.1604627  2.0459  0.04706 *
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+R-squared: 0.513 
+
+--- Robustness: exclude failed banks (N = 44 ) ---
+
+t test of coefficients:
+
+                    Estimate Std. Error t value Pr(>|t|)  
+(Intercept)        0.2351316  0.1626800  1.4454  0.15596  
+uninsured_dep_pct -0.0103552  0.0043886 -2.3596  0.02314 *
+log(assets_bn)     0.0070060  0.0189626  0.3695  0.71368  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+-----  R/08b_calendar_time_portfolio.R  -----
+
+=== CALENDAR-TIME PORTFOLIO AND NAIVE DAILY TABLE ===
+
+Daily average abnormal returns, Event 2 (NAIVE -- assumes banks are
+independent, which they are not; see R/08d for the corrected statistic):
+# A tibble: 5 × 9
+    day Date       port_AR port_se t_port p_port sig   port_CAR n_banks
+  <dbl> <date>       <dbl>   <dbl>  <dbl>  <dbl> <chr>    <dbl>   <dbl>
+1    -2 2023-03-08 -0.0054  0.0013  -4.28 0.0001 ***    -0.0054      47
+2    -1 2023-03-09 -0.075   0.0187  -4.02 0.0002 ***    -0.0805      47
+3     0 2023-03-10 -0.0297  0.0121  -2.46 0.0179 *      -0.110       46
+4     1 2023-03-13 -0.135   0.0255  -5.29 0      ***    -0.245       45
+5     2 2023-03-14  0.022   0.0088   2.50 0.0161 *      -0.223       45
+
+Calendar-time portfolio regression: P_t = alpha_p + beta_p * R_mt + eta_t
+Time-series observations (distinct calendar days in >= 1 window): 15 
+
+t test of coefficients:
+
+              Estimate Std. Error t value  Pr(>|t|)    
+(Intercept) -0.0272419  0.0070329 -3.8735   0.00192 ** 
+Market       2.8288805  0.2728371 10.3684 1.181e-07 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+Daily abnormal return alpha_p = -0.02724 (-2.724%), t = -3.873, p = 0.0019
+Implied 5-day CAAR = -13.62%  [95% CI -21.22% to -6.02%]  (t crit 2.160, 13 d.f.)
+Caution: beta_p here is estimated on crisis days only, so it is
+contaminated by the event itself and should not be read as a normal-times
+loading. The test is robust to dependence but low in power.
+
+-----  R/08c_panel_fixed_effects.R  -----
+
+! Panel FE skipped: Google Trends info_index unavailable.
+
+-----  R/08d_robustness_extra.R  -----
+
+=== EXTRA ROBUSTNESS (Section 8d) ===
+
+-- Leave-one-bank-out: uninsured-deposit coefficient --
+coef range: -0.01403 to -0.00963 
+still significant at 5% in 46 of 47 drops
+most influential bank: SBNY 
+
+-- Bootstrap ( 2000  bank resamples): uninsured-deposit coef --
+mean: -0.01141 | 95% CI [ -0.01805 , -0.0051 ]
+share of resamples < 0: 1 
+
+-- Cross-dependence-adjusted CAAR test (Kolari-Pynnonen) --
+avg pairwise AR correlation (rbar): 0.61 
+naive cross-sectional t: -6.67  | dependence-adjusted t: -0.77 
+(The calendar-time portfolio in Section 8b is the other clustering-robust check.)
+
+-----  R/09_plots.R  -----
+
+-----  R/10_save_results.R  -----
+
+==============================================
+  ✓ SCRIPT COMPLETE (VERSION 2)
+  Upgrades active:
+  [1] KBW expansion —  47 banks available
+  [2] Panel FE regression with Info × UninsuredDep interaction
+  [3] Calendar-time portfolio (clustering-robust)
+  [4] Google Trends (CSV primary / gtrendsR API fallback)
+  [5] Regulatory regime dummy (EGRRCPA 2018)
+  Files saved:
+  event_study_results.csv
+  AAR_CAAR_table.csv
+  regression_data.csv
+  bank_characteristics.csv (with reg_exempt, gsib dummies)
+  calendar_time_portfolio.csv
+  ff3_event_study_results.csv
+  capm_vs_ff3_comparison.csv
+  panel_regression_data.csv
+  CAAR_plot.png
+  CAR_by_bank_E2.png
+  uninsured_vs_CAR.png
+  calendar_time_portfolio.png
+  google_trends_info.png
+==============================================
+
+-----  R/11_corrections.R  -----
+
+
+==================== CORRECTED RESULTS ====================
+
+--- FIX 1: panel de-duplication ---
+Rows BEFORE dedup (as reported in thesis): 1140 
+Duplicated bank-dates: 458 
+Rows AFTER dedup (correct N): 682 
+Distinct banks: 47 | Distinct dates: 15 
+
+=== Panel FE on DEDUPLICATED data (replaces Table 6) ===
+                               m1                m2                m3
+Dependent Var.:                AR                AR                AR
+                                                                     
+uninsd_x_info   -0.0044. (0.0021) -0.0045* (0.0020)  -0.0045 (0.0033)
+assets_x_info                       0.0031 (0.0053)   0.0029 (0.0059)
+reg_x_info                                           -0.0007 (0.0046)
+Fixed-Effects:  ----------------- -----------------  ----------------
+ticker                        Yes               Yes               Yes
+Date                          Yes               Yes               Yes
+_______________ _________________ _________________  ________________
+S.E.: Clustered by: ticker & Date by: ticker & Date by: ticker & Date
+Observations                  682               682               682
+R2                        0.29985           0.29996           0.29996
+Within R2                 0.01766           0.01783           0.01783
+---
+Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+=== Wild cluster bootstrap, clustered by Date, B = 999 (H0: gamma = 0) ===
+(this takes a minute or two)
+m1 : coef = -0.00436 | t = -2.059 | bootstrap p = 0.4344  (999/999 valid)
+m2 : coef = -0.00452 | t = -2.239 | bootstrap p = 0.3654  (999/999 valid)
+m3 : coef = -0.00452 | t = -1.390 | bootstrap p = 0.5896  (999/999 valid)
+
+
+--- FIX 2: calendar-time portfolio (correct specification) ---
+Portfolio days (time-series observations): 15 
+
+P_t = alpha_p + beta_p * R_mt + eta_t   (Newey-West SE, 2 lags)
+
+t test of coefficients:
+
+              Estimate Std. Error t value  Pr(>|t|)    
+(Intercept) -0.0272419  0.0070329 -3.8735   0.00192 ** 
+Market       2.8288805  0.2728371 10.3684 1.181e-07 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+Daily abnormal return alpha_p = -0.02724 (-2.724%)
+t = -3.873 | p = 0.0019
+Implied 5-day CAAR = -13.62%  [95% CI -21.22% to -6.02%]  (t crit = 2.160 on 13 d.f.)
+
+[for comparison] OLD 5-obs t-test: t = -1.615 | p = 0.1817 | df = 4 
+
+
+--- FIX 3: event-window length by bank (Event 2) ---
+   ticker n_days     CAR
+1    SIVB      2 -0.8900
+2    SBNY      3 -0.3382
+3     FRC      5 -1.0450
+4    ZION      5 -0.3738
+5     WAL      5 -0.8535
+6    PACW      5 -0.6907
+7     CMA      5 -0.3892
+8     KEY      5 -0.3466
+9      RF      5 -0.1445
+10    JPM      5 -0.0190
+11    BAC      5 -0.1205
+12    WFC      5 -0.0876
+
+Distribution of window lengths:
+
+ 2  3  5 
+ 1  1 45 
+
+Banks with a complete window: 45 of 47 
+
+(a) Parsimonious regression, COMPLETE-WINDOW banks only (N = 45 ):
+
+t test of coefficients:
+
+                    Estimate Std. Error t value Pr(>|t|)   
+(Intercept)        0.3876982  0.1996537  1.9419 0.058882 . 
+uninsured_dep_pct -0.0142339  0.0049049 -2.9020 0.005883 **
+log(assets_bn)     0.0075134  0.0212518  0.3535 0.725450   
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+(b) Same regression using MEAN daily AR (length-invariant):
+
+t test of coefficients:
+
+                    Estimate Std. Error t value Pr(>|t|)  
+(Intercept)        0.1266910  0.0748389  1.6928  0.09755 .
+uninsured_dep_pct -0.0041259  0.0019968 -2.0663  0.04472 *
+log(assets_bn)     0.0026502  0.0058874  0.4501  0.65482  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+==================== END — SEND ME EVERYTHING ABOVE ====================
+
+-----  13_test_fixes.R  -----
+
+=============== TESTS FOR THE R FIXES ===============
+
+== 1. Kolari-Pynnonen adjustment (R/08d, 12_verify_n48) ======
+  [PASS] adjustment factor at rbar=.616, n=48                     got 0.113228     want 0.11323
+  [PASS] corrected t (thesis Sections 3.3 / 5.2)                  got -0.772213    want -0.772
+  [PASS] old formula reproduced the wrong value                   got -1.24615     want -1.246
+  [PASS] rbar = 0 leaves t unchanged                              got -3.5         want -3.5
+  [PASS] factor strictly decreasing in rbar                       got TRUE         want TRUE
+  [PASS] factor always in (0,1)                                   got TRUE         want TRUE
+
+== 2. Significance stars (R/06, R/08b) =======================
+  [PASS] day -2 (t = -4.48) reproduces Table 4                    got ***          want ***
+  [PASS] day -1 (t = -4.09) reproduces Table 4                    got ***          want ***
+  [PASS] day +0 (t = -2.52) reproduces Table 4                    got *            want *
+  [PASS] day +1 (t = -5.41) reproduces Table 4                    got ***          want ***
+  [PASS] day +2 (t = 2.59) reproduces Table 4                     got *            want *
+  [PASS] old thresholds disagreed with Table 4 on 2 of 5 days     got 2            want 2
+
+== 3. Prediction-error correction (R/05, R/06b) ==============
+  [PASS] (1 + 1/M) factor at M = 190 (thesis says ~1.005)         got 1.00526      want 1.00526
+  [PASS] corrected SE exceeds the old one                         got TRUE         want TRUE
+  [PASS] ratio of corrected to old SE                             got 1.00261      want 1.00261
+  [PASS] matches the S_i used by the Patell test in R/06          got 0.0475286    want 0.0475286
+
+== 4. Calendar-time CI critical value (R/08b, R/11) ==========
+  [PASS] t critical value at 13 d.o.f.                            got 2.16037      want 2.16
+  [PASS] old code used the normal value                           got 1.95996      want 1.96
+  [PASS] corrected interval is wider than the normal one          got TRUE         want TRUE
+       corrected 5-day CAAR interval: [-18.15%, -3.99%]
+
+== 5. Composite information index (R/07) =====================
+  [PASS] the two CSVs share one scale (SVB peaks at 100)          got 100          want 100
+  [PASS] 'bank run' peaks far lower on that shared scale          got 7            want 7
+  [PASS] composite peaks on 13 March (thesis Section 4.4)         got 2023-03-13   want 2023-03-13
+  [PASS] unscaled average at the peak = 53.5 (thesis Section 4.4) got 53.5         want 53.5
+  [PASS] old code gave 100 there instead                          got 100          want 100
+  [PASS] 1 May value ~2.5 (thesis Section 4.4)                    got 2.54206      want 2.54
+  [PASS] peak is ~40x the 1 May bump (thesis Section 4.4)         got 39.3382      want 39.3
+  [PASS] old code gave ~30x instead                               got 29.8253      want 29.8
+  [PASS] Jan-Feb mean ~1 (thesis: 'a normalised value of 1-2')    got 1.04546      want 1.05
+  [PASS] the two versions still correlate above 0.99              got TRUE         want TRUE
+
+== 6. Panel de-duplication (R/08c) ===========================
+  [PASS] 48 banks in the constructed panel                        got 48           want 48
+  [PASS] 15 distinct crisis trading dates                         got 15           want 15
+  [PASS] raw rows before de-duplication                           got 1165         want 1165
+  [PASS] rows after de-duplication (thesis Section 5.4 reports 697) got 697          want 697
+  [PASS] repeated rows removed (thesis reports 468)               got 468          want 468
+  [PASS] SIVB contributes 4 bank-dates                            got 4            want 4
+  [PASS] SBNY contributes 5 bank-dates                            got 5            want 5
+  [PASS] FRC contributes 13 bank-dates (10 March + 27-28 Apr + 1 May) got 13           want 13
+  [PASS] some dates were counted up to 3x                         got 3            want 3
+
+== 7. Estimation-window index guard (R/04, R/06b) ============
+  [PASS] normal case identical to the old form                    got TRUE         want TRUE
+  [PASS] corrected length is 200 trading days                     got 200          want 200
+  [PASS] corrected window ends before the event                   got TRUE         want TRUE
+  [PASS] old form silently estimated on a single row              got 1            want 1
+  [PASS] dropping the guard gives NEGATIVE indices (R would drop rows) got TRUE         want TRUE
+  [PASS] corrected form refuses to estimate instead               got TRUE         want TRUE
+
+== 8. Duplicated bank characteristics (R/06) =================
+  [PASS] KBW CSV carries 46 banks                                 got 46           want 46
+  [PASS] core table carries 14 banks                              got 14           want 14
+  [PASS] 12 tickers appear in both                                got 12           want 12
+  [PASS] bind_rows alone gives 60 rows (the old N)                got 60           want 60
+  [PASS] distinct() gives the 48 the thesis reports               got 48           want 48
+  [PASS] PACW and CMA are core-only (so distinct keeps their hand-checked values) got TRUE         want TRUE
+
+== 9. info_index column collision (R/07) =====================
+  [PASS] old join produced suffixed columns, not info_index       got FALSE        want FALSE
+  [PASS]   the suffixed pair is what appeared instead             got TRUE         want TRUE
+  [PASS] dropping the placeholder first yields a usable info_index got TRUE         want TRUE
+  [PASS] and it carries the joined values                         got 55           want 55
+
+==============================================================
+  54 passed, 0 failed
+==============================================================
+
+
+
+################ STEP 3: VERIFICATION ################
+
+----------  3.0  sample composition  ----------
+  banks loaded: 47 
+  PACW in sample: TRUE | CMA in sample: TRUE 
+
+----------  3.1  PACW / CMA Event 2 CAR   [CRITICAL]  ----------
+  market-model estimates:
+  ticker     alpha  beta    R2   sigma n_est n_days
+1   SIVB -0.002440 1.744 0.368 0.03385   200      2
+2   SBNY -0.003273 1.773 0.572 0.02271   200      3
+3    FRC -0.000630 1.321 0.566 0.01713   200      5
+4    WAL -0.000040 1.450 0.637 0.01622   200      5
+5   PACW -0.000601 1.396 0.617 0.01629   200      5
+6    CMA -0.000475 1.031 0.503 0.01515   200      5
+
+  PACW CAR (%)                     pipeline  -69.0700 | thesis  -69.4000 | MATCH
+      t=-18.916 p=0.0000  est.obs=200  event days=5
+  CMA CAR (%)                      pipeline  -38.9200 | thesis  -38.9000 | MATCH
+      t=-11.460 p=0.0000  est.obs=200  event days=5
+
+  Event 2 CAR ranking, 12 most negative:
+   ticker CAR_pct  t_stat p_value n_days
+1     FRC -104.5% -27.218       0      5
+2    SIVB    -89% -18.544       0      2
+3     WAL -85.35% -23.471       0      5
+4    PACW -69.07% -18.916       0      5
+5     CMA -38.92% -11.460       0      5
+6    ZION -37.38% -12.062       0      5
+7     KEY -34.66% -11.141       0      5
+8    SBNY -33.82%  -8.577       0      3
+9     TFC -30.78% -10.765       0      5
+10   UMBF -27.46%  -9.213       0      5
+11    FHN -26.57% -17.244       0      5
+12   HBAN  -25.7%  -8.832       0      5
+
+----------  3.2  cross-sectional regression (Table 5)  ----------
+  N = 47  (thesis states 48)
+
+  FULL (HC3):
+
+t test of coefficients:
+
+                    Estimate Std. Error t value Pr(>|t|)  
+(Intercept)       -0.0088179  0.6240802 -0.0141   0.9888  
+uninsured_dep_pct -0.0114387  0.0045428 -2.5180   0.0157 *
+log(assets_bn)     0.0115684  0.0224776  0.5147   0.6095  
+tier1_lev          0.0629871  0.0541750  1.1627   0.2515  
+ltd_ratio         -0.0039728  0.0027467 -1.4464   0.1555  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+  adj R2 = 0.4871 
+
+  PARSIMONIOUS (HC3):
+
+t test of coefficients:
+
+                    Estimate Std. Error t value Pr(>|t|)   
+(Intercept)        0.2853123  0.1442525  1.9779  0.05423 . 
+uninsured_dep_pct -0.0111675  0.0036527 -3.0574  0.00379 **
+log(assets_bn)     0.0011703  0.0209152  0.0560  0.95563   
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+  adj R2 = 0.4235 
+
+  full: uninsured coef             pipeline   -0.0114 | thesis   -0.0114 | MATCH
+  full: uninsured p                pipeline    0.0157 | thesis    0.0150 | MATCH
+  full: adj R2                     pipeline    0.4871 | thesis    0.4910 | MATCH
+  pars: uninsured coef             pipeline   -0.0112 | thesis   -0.0111 | MATCH
+  pars: uninsured p                pipeline    0.0038 | thesis    0.0040 | MATCH
+  pars: adj R2                     pipeline    0.4235 | thesis    0.4270 | MATCH
+
+----------  3.3  where the association lives (Sec 5.5)   [CRITICAL]  ----------
+  all banks                      N=47  beta=-0.0112  t=-3.06  p=0.0038
+  excl. 3 failed                 N=44  beta=-0.0104  t=-2.36  p=0.0231
+  excl. 3 worst CARs             N=44  beta=-0.0064  t=-1.91  p=0.0632
+  excl. 4 worst CARs             N=43  beta=-0.0039  t=-3.04  p=0.0042
+  excl. bottom decile            N=42  beta=-0.0032  t=-2.26  p=0.0293
+  excl. bottom quintile          N=38  beta=-0.0014  t=-0.58  p=0.5672
+
+  all: beta                        pipeline   -0.0112 | thesis   -0.0111 | MATCH
+  excl 3 failed: beta              pipeline   -0.0104 | thesis   -0.0104 | MATCH
+  excl 3 failed: p                 pipeline    0.0231 | thesis    0.0240 | MATCH
+  bottom quintile: p               pipeline    0.5672 | thesis    0.9030 | *** MISMATCH ***
+
+  'excl. 3 failed' is the thesis's headline robustness claim.
+  If its p crosses 0.05, the abstract, Sec 5.5 and Sec 6.1 all change.
+
+----------  3.4  unequal event windows   [thesis number known stale]  ----------
+
+ 2  3  5 
+ 1  1 45 
+  complete-window banks: 45 of 47 
+
+  (a) complete-window only:
+
+t test of coefficients:
+
+                    Estimate Std. Error t value Pr(>|t|)   
+(Intercept)        0.3876982  0.1996537  1.9419 0.058882 . 
+uninsured_dep_pct -0.0142339  0.0049049 -2.9020 0.005883 **
+log(assets_bn)     0.0075134  0.0212518  0.3535 0.725450   
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+  (b) mean daily AR (length-invariant):
+
+t test of coefficients:
+
+                    Estimate Std. Error t value Pr(>|t|)  
+(Intercept)        0.1266910  0.0748389  1.6928  0.09755 .
+uninsured_dep_pct -0.0041259  0.0019968 -2.0663  0.04472 *
+log(assets_bn)     0.0026502  0.0058874  0.4501  0.65482  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+  thesis prints -0.0132 (p=.115) and -0.0043 (p=.089) from the old
+  44-bank run. Replace both with whatever is printed above.
+
+----------  3.5  quantile regression (Table 7)  ----------
+   tau      beta       se       t        p
+1 0.10 -0.021591 0.008489 -2.5432 0.014574
+2 0.25 -0.012502 0.004464 -2.8010 0.007542
+3 0.50 -0.012468 0.003851 -3.2381 0.002292
+4 0.75 -0.004781 0.003675 -1.3009 0.200061
+5 0.90 -0.001567 0.002824 -0.5549 0.581794
+  thesis: .10=-0.0203  .25=-0.0125  .50=-0.0124  .75=-0.0048  .90=-0.0014
+
+----------  3.6  bootstrap / leave-one-out / Huber / non-linearity  ----------
+  bootstrap mean -0.0113  95% CI [-0.0178, -0.0053]   (thesis -0.0113 [-0.0179,-0.0049])
+  leave-one-out range [-0.0140, -0.0096] | negative in 47 of 47 | most influential SBNY
+    (thesis: -0.0096 to -0.0140, negative in all 48, most influential SBNY)
+  Huber M-estimator -0.0118   (thesis -0.0118)
+  quadratic p = 0.871   (thesis 0.87)
+  threshold interaction p = 0.497   (thesis 0.49) | banks >60%: 4
+
+----------  3.7  daily-frequency results, now on the full sample  ----------
+  AAR / CAAR, Event 2 (thesis Table 4, currently N=46):
+  day    AAR  n   CAAR
+1  -2  -0.54 47  -0.54
+2  -1  -7.50 47  -8.05
+3   0  -2.97 46 -11.02
+4   1 -13.50 45 -24.52
+5   2   2.20 45 -22.32
+
+  mean pairwise AR correlation 0.610  (thesis 0.62)
+  naive t -6.67  ->  Kolari-Pynnonen t -1.24   (thesis -6.49 -> -1.21)
+
+
+################ STEP 4: SUMMARY ################
+  checks run: 12 | matched: 11 | mismatched: 1 
+
+  MISMATCHED:
+    - bottom quintile: p 
+
+  The pipeline is authoritative. Every mismatched value above must
+  be corrected in the thesis, not the other way round.
+
+  saved objects: results_summary, reg, bank_chars, returns_df
+  wrote output/cross_section_N48.csv and output/event2_CARs_N48.csv
+
+  SEND ME: output/RUN_LOG.txt
+
+run finished: 2026-09-06 08:12:54 

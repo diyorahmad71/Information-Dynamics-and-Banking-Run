@@ -130,9 +130,9 @@ if (!is.null(ff3_df)) {
   cat("  (Section 5.5 claims the ordering is 'broadly' preserved -- this line\n")
   cat("   reports exactly how broadly, so the wording can be checked.)\n")
  
-  write_csv(ff3_results,    "ff3_event_study_results.csv")
-  write_csv(capm_x_results, "capm_excess_event_study_results.csv")
-  write_csv(car_comparison, "capm_vs_ff3_comparison.csv")
+  write_csv(ff3_results,    "output/ff3_event_study_results.csv")
+  write_csv(capm_x_results, "output/capm_excess_event_study_results.csv")
+  write_csv(car_comparison, "output/capm_vs_ff3_comparison.csv")
   message("✓ FF3 robustness complete")
 } else {
   ff3_results <- NULL

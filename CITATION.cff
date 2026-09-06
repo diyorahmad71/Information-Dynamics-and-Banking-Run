@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this replication package, please cite the thesis."
+title: "Information Dynamics and Bank Runs: An Event Study of the 2023 Banking Crisis"
+type: thesis
+authors:
+  - family-names: Ahmadjonov
+    given-names: Diyorbek
+thesis-type: "Master's thesis"
+institution:
+  name: Rheinische Friedrich-Wilhelms-Universität Bonn
+  address: Bonn, Germany
+year: 2026
+month: 9
+license: MIT
+repository-code: "https://github.com/diyorahmad71/Information-Dynamics-and-Banking-Run"
+keywords:
+  - bank runs
+  - event study
+  - uninsured deposits
+  - 2023 banking crisis
+  - Silicon Valley Bank

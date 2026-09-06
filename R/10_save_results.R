@@ -5,14 +5,14 @@
 # =====================================================================
 
 # ── 10. SAVE RESULTS ─────────────────────────────────────────
-write_csv(results_summary, "event_study_results.csv")
-write_csv(AAR_table,       "AAR_CAAR_table.csv")
-write_csv(reg_df,          "regression_data.csv")
-write_csv(bank_chars,      "bank_characteristics.csv")
-write_csv(ct_portfolio,    "calendar_time_portfolio.csv")
+write_csv(results_summary, "output/event_study_results.csv")
+write_csv(AAR_table,       "output/AAR_CAAR_table.csv")
+write_csv(reg_df,          "output/regression_data.csv")
+write_csv(bank_chars,      "output/bank_characteristics.csv")
+write_csv(ct_portfolio,    "output/calendar_time_portfolio.csv")
 if (!is.null(ff3_results)) {
-  write_csv(ff3_results,    "ff3_event_study_results.csv")
-  write_csv(car_comparison, "capm_vs_ff3_comparison.csv")
+  write_csv(ff3_results,    "output/ff3_event_study_results.csv")
+  write_csv(car_comparison, "output/capm_vs_ff3_comparison.csv")
 }
  
 cat("\n")

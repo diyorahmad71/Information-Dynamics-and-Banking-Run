@@ -1,0 +1,48 @@
+ticker,uninsured_dep_pct,assets_bn,tier1_lev,ltd_ratio,reg_exempt,gsib,size_cat
+SIVB,94.3,209,7.96,42,0,0,Mid-Size Regional
+SBNY,89.3,110.4,8.79,83.9,0,0,Mid-Size Regional
+FRC,67.3,212.6,8.51,94.1,0,0,Mid-Size Regional
+ZION,49.2,89.5,7.65,76.5,1,0,Small Regional
+WAL,52.6,67.7,8.22,98.7,1,0,Small Regional
+PACW,71.1,44.3,9.7,84.4,1,0,Small Regional
+CMA,59.3,85.5,9.01,71.9,1,0,Small Regional
+KEY,48.2,187.6,8.78,81.8,0,0,Mid-Size Regional
+RF,34.8,154.2,8.8,71.7,0,0,Mid-Size Regional
+JPM,59.5,3201.9,8.3,46.1,0,1,G-SIB / SIFI
+BAC,41.7,2418.5,7.68,50.4,0,1,G-SIB / SIFI
+WFC,39.3,1717.5,8.34,63.8,0,1,G-SIB / SIFI
+USB,52.2,585.1,8.05,71.2,0,0,Large Regional
+TFC,41.8,546,8.54,76,0,0,Large Regional
+BANR,37.9,15.8,9.4,74.5,1,0,Small Regional
+BOKF,48.2,47.8,8.6,72.1,1,0,Small Regional
+CATY,38.1,22.6,9.7,74.3,1,0,Small Regional
+CBSH,56.7,31.7,9.2,61.7,1,0,Small Regional
+CFG,41.9,226.4,8.85,86.2,0,0,Mid-Size Regional
+COLB,38.6,52.1,8.9,81,1,0,Small Regional
+CVBF,41.7,16,9.9,42.1,1,0,Small Regional
+EBC,32.7,13.4,9.2,63.2,1,0,Small Regional
+EWBC,47.2,64.1,9.15,85.8,1,0,Small Regional
+FFBC,32.8,16.9,9.3,80.5,1,0,Small Regional
+FFIN,50.7,13.1,9.8,49.3,1,0,Small Regional
+FHN,45.1,78.7,9.2,90.5,1,0,Small Regional
+FITB,46.5,206.3,8.45,72.3,0,0,Mid-Size Regional
+GABC,37.5,5.8,9.4,66.8,1,0,Small Regional
+GBCI,42.7,26.6,9.6,73.8,1,0,Small Regional
+HAFC,37.6,7.3,9.5,96.7,1,0,Small Regional
+HBAN,44.2,182.3,8.12,79.5,0,0,Mid-Size Regional
+HWC,38.5,35.2,9.8,79.2,1,0,Small Regional
+IBCP,34.7,4.8,9.2,72.3,1,0,Small Regional
+INDB,37.8,19.3,9.2,86.8,1,0,Small Regional
+ONB,35.7,46.5,9.1,87.9,1,0,Small Regional
+OZK,32.4,27.7,11.4,96.6,1,0,Small Regional
+PB,37.6,37.9,9,56.8,1,0,Small Regional
+RNST,34.5,17,9.1,85.6,1,0,Small Regional
+SFNC,34.8,26.5,9.3,66.1,1,0,Small Regional
+TCBI,54.9,36.7,9.5,79.4,1,0,Small Regional
+TRMK,37.1,16.8,9.2,73.6,1,0,Small Regional
+UBSI,34.4,29.4,9.1,91.4,1,0,Small Regional
+UMBF,54,37.7,8.1,68.9,1,0,Small Regional
+VLY,39.8,57.5,8.4,98.2,1,0,Small Regional
+WAFD,35.7,21.6,9.3,106,1,0,Small Regional
+WSFS,34.6,16.1,9.3,74.1,1,0,Small Regional
+WTFC,40.1,52.9,8.95,86.3,1,0,Small Regional

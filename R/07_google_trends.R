@@ -238,7 +238,7 @@ if (!is.null(gt_long) && nrow(gt_long) > 0) {
     }
     library(patchwork)
     p_dual <- p_gt_top / p_gt_bot + plot_layout(heights = c(2, 1))
-    ggsave("google_trends_dual_panel.png", p_dual,
+    ggsave("output/google_trends_dual_panel.png", p_dual,
            width = 11, height = 7, dpi = 300)
     message("  ✓ google_trends_dual_panel.png saved (Figure 1 in thesis)")
  

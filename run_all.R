@@ -24,6 +24,8 @@
 #  first.
 # ============================================================
 
+if (!dir.exists("output")) dir.create("output")
+
 scripts <- c(
   "R/00_packages.R",
   "R/01_settings_events.R",

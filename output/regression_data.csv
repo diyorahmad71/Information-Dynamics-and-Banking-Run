@@ -1,0 +1,48 @@
+ticker,CAR,sigma,uninsured_dep_pct,assets_bn,tier1_lev,ltd_ratio,reg_exempt,gsib,size_cat
+SIVB,-0.89,0.03385,94.3,209,7.96,42,0,0,Mid-Size Regional
+SBNY,-0.3382,0.02271,89.3,110.4,8.79,83.9,0,0,Mid-Size Regional
+FRC,-1.045,0.01713,67.3,212.6,8.51,94.1,0,0,Mid-Size Regional
+ZION,-0.3738,0.01382,49.2,89.5,7.65,76.5,1,0,Small Regional
+WAL,-0.8535,0.01622,52.6,67.7,8.22,98.7,1,0,Small Regional
+PACW,-0.6907,0.01629,71.1,44.3,9.7,84.4,1,0,Small Regional
+CMA,-0.3892,0.01515,59.3,85.5,9.01,71.9,1,0,Small Regional
+KEY,-0.3466,0.01388,48.2,187.6,8.78,81.8,0,0,Mid-Size Regional
+RF,-0.1445,0.01359,34.8,154.2,8.8,71.7,0,0,Mid-Size Regional
+JPM,-0.019,0.01143,59.5,3201.9,8.3,46.1,0,1,G-SIB / SIFI
+BAC,-0.1205,0.01235,41.7,2418.5,7.68,50.4,0,1,G-SIB / SIFI
+WFC,-0.0876,0.01314,39.3,1717.5,8.34,63.8,0,1,G-SIB / SIFI
+USB,-0.1826,0.01283,52.2,585.1,8.05,71.2,0,0,Large Regional
+TFC,-0.3078,0.01275,41.8,546,8.54,76,0,0,Large Regional
+FITB,-0.2444,0.01385,46.5,206.3,8.45,72.3,0,0,Mid-Size Regional
+HBAN,-0.257,0.01298,44.2,182.3,8.12,79.5,0,0,Mid-Size Regional
+CFG,-0.1783,0.0127,41.9,226.4,8.85,86.2,0,0,Mid-Size Regional
+FHN,-0.2657,0.00687,45.1,78.7,9.2,90.5,1,0,Small Regional
+COLB,-0.2252,0.01374,38.6,52.1,8.9,81,1,0,Small Regional
+OZK,-0.1054,0.01369,32.4,27.7,11.4,96.6,1,0,Small Regional
+WTFC,-0.1476,0.01209,40.1,52.9,8.95,86.3,1,0,Small Regional
+BOKF,-0.11,0.01203,48.2,47.8,8.6,72.1,1,0,Small Regional
+UMBF,-0.2746,0.0133,54,37.7,8.1,68.9,1,0,Small Regional
+VLY,-0.1002,0.01225,39.8,57.5,8.4,98.2,1,0,Small Regional
+HWC,-0.1751,0.01316,38.5,35.2,9.8,79.2,1,0,Small Regional
+EWBC,-0.2192,0.01523,47.2,64.1,9.15,85.8,1,0,Small Regional
+CBSH,-0.0515,0.00979,56.7,31.7,9.2,61.7,1,0,Small Regional
+FFBC,-0.0543,0.01153,32.8,16.9,9.3,80.5,1,0,Small Regional
+PB,-0.108,0.01125,37.6,37.9,9,56.8,1,0,Small Regional
+TCBI,-0.1399,0.01594,54.9,36.7,9.5,79.4,1,0,Small Regional
+ONB,-0.0963,0.01241,35.7,46.5,9.1,87.9,1,0,Small Regional
+UBSI,-0.0452,0.01174,34.4,29.4,9.1,91.4,1,0,Small Regional
+GBCI,-0.063,0.01219,42.7,26.6,9.6,73.8,1,0,Small Regional
+INDB,-0.0978,0.01142,37.8,19.3,9.2,86.8,1,0,Small Regional
+WSFS,-0.153,0.01427,34.6,16.1,9.3,74.1,1,0,Small Regional
+BANR,-0.1147,0.01228,37.9,15.8,9.4,74.5,1,0,Small Regional
+FFIN,-0.0861,0.01417,50.7,13.1,9.8,49.3,1,0,Small Regional
+TRMK,-0.0826,0.01485,37.1,16.8,9.2,73.6,1,0,Small Regional
+SFNC,-0.0784,0.01474,34.8,26.5,9.3,66.1,1,0,Small Regional
+HAFC,-0.1255,0.01323,37.6,7.3,9.5,96.7,1,0,Small Regional
+CVBF,-0.1752,0.01178,41.7,16,9.9,42.1,1,0,Small Regional
+RNST,-0.0593,0.01305,34.5,17,9.1,85.6,1,0,Small Regional
+WAFD,-0.0584,0.01301,35.7,21.6,9.3,106,1,0,Small Regional
+CATY,-0.1052,0.01081,38.1,22.6,9.7,74.3,1,0,Small Regional
+EBC,-0.2073,0.01404,32.7,13.4,9.2,63.2,1,0,Small Regional
+GABC,-0.0962,0.01183,37.5,5.8,9.4,66.8,1,0,Small Regional
+IBCP,-0.1463,0.01303,34.7,4.8,9.2,72.3,1,0,Small Regional

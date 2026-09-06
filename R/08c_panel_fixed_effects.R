@@ -132,7 +132,7 @@ if (!is.na(returns_df$info_index[1]) &&
     cat("γ2 (logAssets × Info): Positive = size buffers against panic-driven losses.\n")
     cat("γ3 (RegExempt × Info): Negative = regulatory loophole exposed under scrutiny.\n")
  
-    write_csv(panel_df, "panel_regression_data.csv")
+    write_csv(panel_df, "output/panel_regression_data.csv")
     message("✓ Panel data saved: panel_regression_data.csv")
  
   } else {

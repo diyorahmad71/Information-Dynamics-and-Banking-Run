@@ -135,11 +135,13 @@ cert_map <- tribble(
 # deposit % and Tier 1 leverage from FDIC Call Report annual disclosures.
 bank_chars_kbw <- NULL
  
-if (file.exists("kbw_bank_chars.csv")) {
-  bank_chars_kbw <- read_csv("kbw_bank_chars.csv", show_col_types = FALSE) %>%
+kbw_path <- c("kbw_bank_chars.csv", file.path("data", "kbw_bank_chars.csv"))
+kbw_path <- kbw_path[file.exists(kbw_path)][1]
+if (!is.na(kbw_path)) {
+  bank_chars_kbw <- read_csv(kbw_path, show_col_types = FALSE) %>%
     filter(ticker %in% available) %>%
     select(ticker, assets_bn, uninsured_dep_pct, tier1_lev, ltd_ratio)
-  message("  OK kbw_bank_chars.csv: ", nrow(bank_chars_kbw), " KBW banks loaded")
+  message("  OK ", kbw_path, ": ", nrow(bank_chars_kbw), " KBW banks loaded")
 } else {
   message("  kbw_bank_chars.csv not found — using hard-coded fallback")
 }
