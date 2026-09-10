@@ -1,0 +1,16 @@
+# R
+.Rhistory
+.Rapp.history
+.RData
+.Rproj.user/
+.Ruserdata
+
+# macOS / editors
+.DS_Store
+.vscode/
+*~
+
+# Raw price downloads: sources documented in data/README.md, files not redistributed
+data/raw/*
+!data/raw/.gitkeep
+
